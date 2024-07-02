@@ -68,7 +68,7 @@ resource "kubernetes_deployment" "flask_app" {
         container {
           image = "${var.ecr_repository}:latest"
           name  = "flask-app"
-          ports {
+          port {
             container_port = 5000
           }
         }
@@ -95,4 +95,9 @@ resource "kubernetes_service" "flask_app" {
       target_port = 5000
     }
   }
+}
+
+# Data source for EKS cluster authentication
+data "aws_eks_cluster_auth" "main" {
+  name = aws_eks_cluster.main.name
 }
