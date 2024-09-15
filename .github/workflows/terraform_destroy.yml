@@ -1,4 +1,4 @@
-name: Terraform Destroy
+name: Terraform Destroy - EKS Infrastructure
 
 on:
   push:
@@ -6,37 +6,15 @@ on:
       - destroy
 
 jobs:
-  terraform:
-    runs-on: ubuntu-latest
-
+  deploy:
+    uses: TheMashcraft/terraform-reusable-workflows/.github/workflows/aws-terraform-destroy.yml@main
+    with:
+      terraform_dir: './'                   # Directory containing Terraform configuration
+      terraform_version: '1.5.2'            # Version of Terraform to use
+      aws_iam_role: 'arn:aws:iam::747693303791:role/GithubActionsRole'  # AWS IAM role to assume
+      aws_region: 'us-east-1'               # AWS region for deployment
+      plan_file: 'terraform.tfplan'         # Path to save the Terraform plan file
     permissions:
       id-token: write
       contents: read
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.5.2
-
-    - name: Configure AWS credentials
-      id: aws-creds
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: arn:aws:iam::747693303791:role/GithubActionsRole
-        aws-region: us-east-1
-
-    - name: Terraform Init
-      run: terraform init
-
-    - name: Terraform Validate
-      run: terraform validate
-
-    - name: Terraform Plan Destroy
-      run: terraform plan -destroy
-
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve
+      
